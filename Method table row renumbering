@@ -1,0 +1,155 @@
+/// <summary>
+        /// Метод предназначен для получения атрибутов и перстроения в нем номеров граф для отображения на контроле
+        /// </summary>
+        /// <param name="listWithAttributes"> Выходной список с атрибутами - колонками на контроле </param>
+        /// <param name="bokrownums">  </param>
+        /// <returns> Возникшее исключение Exception </returns>
+        public Exception GetListOfAttributes(out List<ControlListViewAttribute> listWithAttributes, List<int> bokrownums = null)
+        {
+            listWithAttributes = new List<ControlListViewAttribute>();
+            var listOfAttrib = new List<ControlListViewAttribute>();
+            Exception currentThrowedException = null;
+            
+            //ПОЛУЧЕНИЕ ОТЛИЧАЮЩИХСЯ ПО ФОРМЕ И ТАБЛИЦЕ УСЛОВИЙ 
+            var distinctedConditions = mainModel.CollectionOfConditions.DistinctBy(s=> s.IdForm).ToList();
+            var cumulativeData = new List<ControlListViewAttributeManagerArchiveOverrided>();
+            var tasksList = new List<Task>();
+            var _lock = new object();
+                //ПРОХОД ПО ПАРАМЕТРАМ
+            foreach (var item in distinctedConditions)
+            {
+                tasksList.Add(Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        ControlListViewAttributeManagerArchive templateClass;
+                        using (var ascrvClient = mainModel.SetAscrvDataClient())
+                        {
+                            //ПОЛУЧЕНИЕ ШАБЛОНА В ВИДЕ ДВОИЧНЫХ ДАННЫХ ИЗ БАЗЫ ДАННЫХ В ТАБЛИЦЕ BinaryContentOfExcelTemplates
+                            var exceptionGetXMLTableFile =
+                                ascrvClient.GetXMLTableFile(item.YearOfSelectedGraph, item.IdForm, out var list);
+                            if (exceptionGetXMLTableFile != null) throw new Exception(exceptionGetXMLTableFile.Message);
+                            //ПРЕОБРАЗОВАНИЕ ДВОИЧНЫХ ФАЙЛОВ КЛАСС
+                            templateClass =
+                                XMLHelper.FromByteArrayToClass<ControlListViewAttributeManagerArchive>(list);
+                        }
+
+                        if (templateClass == null)
+                            throw new Exception("Отсутсвует шаблон в бд по форме " + item.IdForm +
+                                                ". Требуемый год описания ранее " + item.YearOfSelectedGraph +
+                                                " года.Обратитесь к разработчикам для решения данной проблемы.");
+
+                        if (templateClass.ControlListViewAttributeManagers.Count == 0)
+                            throw new Exception(
+                                "Шаблон неккоректен.Количество возвращенных столбцов равно 0.Обратитесь к разработчикам для решения данной проблемы.");
+                        //ДОСТУП К РАЗДЕЛЯЕМЫМ РЕСУРСАМ
+                        lock (_lock)
+                        {
+                            cumulativeData.Add(new ControlListViewAttributeManagerArchiveOverrided
+                            {
+                                ControlListViewAttributeManagers = templateClass.ControlListViewAttributeManagers,
+                                CurrentIdForm = item.IdForm, InscriptionListXML = templateClass.InscriptionListXML,
+                                StylesListXML = templateClass.StylesListXML, TitleListXML = templateClass.TitleListXML
+                            });
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        mainViewAdapter.ShowMessage(exception);
+                        currentThrowedException = exception;
+                    }
+                }));
+            }
+
+            Task.WaitAll(tasksList.ToArray());
+
+            foreach (var currentCondition in mainModel.CollectionOfConditions)
+            {
+                var templateClass =
+                    cumulativeData.FirstOrDefault(s => s.CurrentIdForm == currentCondition.IdForm);
+                if (templateClass == null) continue;
+
+                //ПОЛУЧЕНИЕ КОНКРЕТНОГО СТОЛБЦА
+                var attr = templateClass.ControlListViewAttributeManagers.FirstOrDefault(x =>
+                        x.IDForm == currentCondition.IdForm && x.IDTable == currentCondition.IdTable)?
+                    ._attributes
+                    .FirstOrDefault(x => x.PropertyName == currentCondition.NumOfSelectedGraph);
+                if (attr == null) continue;
+
+                var lastTild = attr.PropertyHeader.LastIndexOf("~", StringComparison.Ordinal);
+
+                listOfAttrib.Add(new ControlListViewAttribute
+                {
+                    PropertyName = currentCondition.IdForm + "~" + currentCondition.IdTable + "~" +
+                                   currentCondition.KodOfSelectedRow + "~" +
+                                   currentCondition.KodOfSelectedGraph,
+                    PropertyHeader =
+                        $"{currentCondition.IdForm}~{currentCondition.IdTable}~{attr.PropertyHeader.Substring(0, lastTild)}~{attr.PropertyHeader.Substring(lastTild + 1, 1)}",
+                    PropertyBokovikNames = attr.PropertyBokovikNames,
+                    PropertyWidthInPercent = attr.PropertyWidthInPercent,
+                    PropertyTypeDan = attr.PropertyTypeDan,
+                    PropertyIsEditable = attr.PropertyIsEditable,
+                    PropertyWidth = attr.PropertyWidth,
+                    PropertyIsBokovik = attr.PropertyIsBokovik
+                });
+            }
+
+            //Перенумеруем столбцы
+            int itemnum = 1;
+            //Перенумеруем строки
+            int rownum = 1;
+            //Ширина в %
+            double widthpercent = 100;
+
+            if (listOfAttrib.Any())
+            {
+                widthpercent = 100 / listOfAttrib.Count;
+
+                int maxCountOfTilde = listOfAttrib.Max(x => x.PropertyHeader.Split('~').Count()) - 1;
+                listOfAttrib = listOfAttrib.OrderByDescending(x => x.PropertyIsBokovik).ToList();
+
+                foreach (var itemAttrib in listOfAttrib)
+                {
+                    if (itemAttrib.PropertyIsBokovik && bokrownums != null)
+                    {
+                        itemAttrib.PropertyBokovikNames = itemAttrib.PropertyBokovikNames
+                            .Where(x => bokrownums.Contains(x.BokovikRowNumber)).ToList();
+
+                        foreach (var rowitem in itemAttrib.PropertyBokovikNames)
+                        {
+                            rowitem.BokovikRowNumber = rownum;
+                            rownum++;
+                        }
+                    }
+
+                    //переприсваивание номера столбца
+                    //item.PropertyName = itemnum.ToString();
+                    itemAttrib.PropertyWidthInPercent = widthpercent;
+                    if (maxCountOfTilde > itemAttrib.PropertyHeader.Split('~').Count() - 1)
+                    {
+                        int lastcharindex = itemAttrib.PropertyHeader.LastIndexOf('~');
+                        string lastchar = itemAttrib.PropertyHeader.Substring(lastcharindex + 1,
+                            itemAttrib.PropertyHeader.Length - lastcharindex - 1);
+                        itemAttrib.PropertyHeader = itemAttrib.PropertyHeader.Substring(0, lastcharindex + 1);
+                        for (int j = itemAttrib.PropertyHeader.Split('~').Count() - 1; j < maxCountOfTilde; j++)
+                        {
+                            itemAttrib.PropertyHeader = itemAttrib.PropertyHeader +
+                                                        itemAttrib.PropertyHeader.Split('~')[
+                                                            itemAttrib.PropertyHeader.Split('~').Count() - 2] + "~";
+                        }
+                        itemAttrib.PropertyHeader = itemAttrib.PropertyHeader + lastchar;
+                    }
+
+                    itemnum++;
+                }
+            }
+
+            listWithAttributes.AddRange(listOfAttrib);
+            
+            return currentThrowedException;
+        }
+
+        private class ControlListViewAttributeManagerArchiveOverrided : ControlListViewAttributeManagerArchive
+        {
+            public string CurrentIdForm { get; set; }
+        }
