@@ -1,0 +1,1113 @@
+﻿<UserControl 
+    xmlns:Views="clr-namespace:ASCRV.CommonControls.VisualPeriodSelectorControl.Views;assembly=CommonControls"
+    x:Class="ASCRV.SearchByRequest.MainWindow"
+    xmlns:controls="clr-namespace:ASCRV.CommonControls.ControlListView;assembly=CommonControls"
+    xmlns:localControls="clr-namespace:ASCRV.SearchByRequest.Controls"
+    xmlns:daisyControl="clr-namespace:ASCRV.CommonControls.DaisyControl;assembly=CommonControls"
+    xmlns:sys="clr-namespace:System;assembly=mscorlib"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:converters="clr-namespace:ASCRV.CommonConverters;assembly=CommonConverters"
+    xmlns:localConverters="clr-namespace:ASCRV.SearchByRequest.Converters"
+    mc:Ignorable="d" 
+    d:DesignHeight="650" d:DesignWidth="1000">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- ФАЙЛ РЕСУРСОВ ОБЩИЙ -->
+                <ResourceDictionary Source="pack://application:,,,/SearchByRequest;component/Icons/LocalIcons.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <SolidColorBrush x:Key="SolidColorTextCombobox" Color="{DynamicResource SearchByRequestColorOfTextCombobox}"/>
+            <SolidColorBrush x:Key="SolidColorTextComboboxSecond" Color="{DynamicResource SearchByRequestColorOfTextComboboxSecond}"/>
+            <sys:Double x:Key="FourPercent">0.04</sys:Double>
+            <sys:Double x:Key="EightPercent">0.08</sys:Double>
+            <sys:Double x:Key="TenPercent">0.1</sys:Double>
+            <sys:Double x:Key="TwentyPercent">0.2</sys:Double>
+            <sys:Double x:Key="FiveteenPercent">0.15</sys:Double>
+            <sys:Double x:Key="ThirtyFivePercent">0.35</sys:Double>
+            <sys:Double x:Key="FourtyPercent">0.4</sys:Double>
+            <sys:Double x:Key="SeventyPercent">0.7</sys:Double>
+            <sys:Double x:Key="EightyPercent">0.8</sys:Double>
+            <sys:Double x:Key="NinetyPercent">0.9</sys:Double>
+            <localConverters:ListViewInscriptionVisibility x:Key="ListViewInscriptionVisibility"/>
+            <localConverters:QueryContentConverter x:Key="QueryContentConverter"/>
+            <localConverters:ExcelReportButtonIsEnabledPropertyConverter x:Key="ExcelReportButtonIsEnabledPropertyConverter"/>
+            <converters:MathConverter x:Key="MathConverter"/>
+            <converters:FontSizeConverterH1 x:Key="FontSizeConverterH1"/>
+            <converters:FontSizeConverterH2 x:Key="FontSizeConverterH2"/>
+            <converters:FontSizeConverterH3 x:Key="FontSizeConverterH3"/>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+
+        <GroupBox Header="Поиск по произвольным и фиксированным запросам">
+            <!-- Рутовый грид -->
+            <Grid
+                x:Name="RootGrid">
+
+                <Grid.Resources>
+                    <ResourceDictionary>
+                        <CollectionViewSource x:Key="ListZones" Source="{Binding ListCommonControlsClassSurveillanceZones}"/>
+                    </ResourceDictionary>
+                </Grid.Resources>
+
+                <!-- Грид с основной частью -->
+                <Grid
+                    x:Name="OuterGrid">
+
+                    <!-- Контейнер для обеспечения анимации -->
+                    <Canvas 
+                        Height="{Binding ElementName=OuterGrid, Path=ActualHeight}"
+                        Width="{Binding ElementName=OuterGrid, Path=ActualWidth}">
+
+                        <!-- Грид с сохраненными запросами -->
+                        <Grid
+                            x:Name="GridWithSelectionOfSavedQueries"
+                                                               
+                            Height="{Binding ElementName=OuterGrid, Path=ActualHeight}"
+                            Width="{Binding ElementName=OuterGrid, Path=ActualWidth}"
+
+                            Canvas.Left="0">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Групповое поле "Общие запросы" -->
+                            <GroupBox
+                                Grid.Row="0"
+                                Header="Общие запросы">
+
+                                <!-- СПИСОК С ОБЩИМИ ЗАПРОСАМИ -->
+                                <ListView
+                                    x:Name="ListViewWithCommonRequest"
+                                    ItemsSource="{Binding CollectionWithCommonFixedQueries}"
+                                    Margin="10">
+
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridView.Columns>
+
+                                                <!-- НАИМЕНОВАНИЕ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCName"
+                                                    Header="Наименование"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource FiveteenPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <TextBlock
+                                                                Text="{Binding FixedQueryName}" 
+                                                                TextAlignment="Center"
+                                                                FontStyle="Italic"
+                                                                TextWrapping="Wrap"
+                                                                Width="{Binding ElementName=GVCName,
+                                                                                Path=ActualWidth}"/>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- УСЛОВИЯ -->
+                                                <GridViewColumn
+                                                    x:Name="GVCConditions"
+                                                    Header="Условия"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource FiveteenPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <ScrollViewer
+                                                                MaxHeight="100">
+
+                                                                <TextBlock
+                                                                    Text="{Binding FixedQueryConditions}" 
+                                                                    TextAlignment="Center"
+                                                                    FontStyle="Italic"
+                                                                    TextWrapping="Wrap"
+                                                                    Width="{Binding ElementName=GVCConditions,
+                                                                                    Path=ActualWidth}"/>
+                                                            </ScrollViewer>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- СОДЕРЖИМОЕ УСЛОВИЙ -->
+                                                <GridViewColumn
+                                                    x:Name="GVCContent"
+                                                    Header="Содержимое условий"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource ThirtyFivePercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <ScrollViewer
+                                                                MaxHeight="100">
+
+                                                                <TextBlock
+                                                                    Text="{Binding FixedQueryContent,
+                                                                                   Converter={StaticResource QueryContentConverter},
+                                                                                   ConverterParameter={StaticResource ListZones}}" 
+                                                                    TextAlignment="Center"
+                                                                    FontStyle="Italic"
+                                                                    TextWrapping="Wrap"
+                                                                    Width="{Binding ElementName=GVCContent,
+                                                                                    Path=ActualWidth}"/>
+
+                                                            </ScrollViewer>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- КОММЕНТАРИЙ -->
+                                                <GridViewColumn
+                                                    x:Name="GVCComment"
+                                                    Header="Комментарий"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource TenPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ScrollViewer
+                                                                MaxHeight="100">
+
+                                                                <TextBlock
+                                                                    Text="{Binding FixedQueryComment}" 
+                                                                    TextAlignment="Center"
+                                                                    FontStyle="Italic"
+                                                                    TextWrapping="Wrap"
+                                                                    Width="{Binding ElementName=GVCComment,
+                                                                                    Path=ActualWidth}"/>
+                                                            </ScrollViewer>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- ДАТА СОЗДАНИЯ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCDateCreated"
+                                                    Header="Дата создания"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource EightPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <TextBlock
+                                                                Text="{Binding FixedQueryDateCreated, StringFormat=dd-MM-yyyy}" 
+                                                                TextAlignment="Center"
+                                                                FontStyle="Italic"
+                                                                TextWrapping="Wrap"
+                                                                Width="{Binding ElementName=GVCDateCreated,
+                                                                                Path=ActualWidth}"/>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- КНОПКА РЕДАКТИРОВАНИЯ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCCommonEdit"
+                                                    Header="Действие"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource EightPercent}}">
+
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <Button
+                                                                Tag="{Binding FixedQueryId}"
+                                                                Click="ClickOnEditCommonQueryButton"
+                                                                Content="Редактировать"
+                                                                Width="{Binding ElementName=GVCCommonEdit,
+                                                                        Path=ActualWidth,
+                                                                        Converter={StaticResource MathConverter},
+                                                                        ConverterParameter={StaticResource NinetyPercent}}"/>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+
+                                                </GridViewColumn>
+
+                                                <!-- КНОПКА УДАЛЕНИЯ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCCommonRemove"
+                                                    Header="Действие"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource EightPercent}}">
+
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <Button
+                                                                Tag="{Binding FixedQueryId}"
+                                                                Click='ClickOnRemoveCommonQueryButton'
+                                                                Content="Удалить"
+                                                                Width="{Binding ElementName=GVCCommonRemove,
+                                                                        Path=ActualWidth,
+                                                                        Converter={StaticResource MathConverter},
+                                                                        ConverterParameter={StaticResource NinetyPercent}}"/>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+
+                                                </GridViewColumn>
+
+                                            </GridView.Columns>
+                                        </GridView>
+                                    </ListView.View>
+
+                                </ListView>
+
+                            </GroupBox>
+
+                            <!-- Надпись об отсутствии общих запросов -->
+                            <TextBlock
+                                Grid.Row="0"
+                                Visibility="{Binding ElementName=ListViewWithCommonRequest,
+                                                     Path=HasItems,
+                                                     Converter={StaticResource ListViewInscriptionVisibility}}"
+                                x:Name="InscriptionOnCommonListView"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="Отсутствуют общие запросы"
+                                FontStyle="Italic"
+                                FontSize="20"/>
+
+                            <!-- Разделитель двух частей -->
+                            <GridSplitter
+                                Grid.Row="1"
+                                ShowsPreview="False"
+                                Margin="10,0,10,0"/>
+
+                            <!-- Групповое поле "Персональные запросы" -->
+                            <GroupBox
+                                Grid.Row="2"
+                                Header="Персональные запросы">
+
+                                <!-- Список с персональными запросами -->
+                                <ListView
+                                    x:Name="ListViewWithPersonalRequest"
+                                    ItemsSource="{Binding CollectionWithPersonalFixedQueries}"
+                                    Margin="10">
+
+                                    <ListView.View>
+                                        <GridView>
+                                            <GridView.Columns>
+
+                                                <!-- НАИМЕНОВАНИЕ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalName"
+                                                    Header="Наименование"
+                                                    
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource FiveteenPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock
+                                                                Text="{Binding FixedQueryName}" 
+                                                                TextAlignment="Center"
+                                                                FontStyle="Italic"
+                                                                TextWrapping="Wrap"
+                                                                Width="{Binding ElementName=GVCPersonalName,
+                                                                        Path=ActualWidth}"/>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- УСЛОВИЯ -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalConditions"
+                                                    Header="Условия"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource FiveteenPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <ScrollViewer
+                                                                MaxHeight="100">
+
+                                                                <TextBlock
+                                                                    Text="{Binding FixedQueryConditions}" 
+                                                                    TextAlignment="Center"
+                                                                    FontStyle="Italic"
+                                                                    TextWrapping="Wrap"
+                                                                    Width="{Binding ElementName=GVCPersonalConditions,
+                                                                        Path=ActualWidth}"/>
+
+                                                            </ScrollViewer>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- СОДЕРЖИМОЕ УСЛОВИЙ -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalContent"
+                                                    Header="Содержимое условий"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource ThirtyFivePercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <ScrollViewer
+                                                                MaxHeight="100">
+
+                                                                <TextBlock
+                                                                    Text="{Binding FixedQueryContent,
+                                                                                   Converter={StaticResource QueryContentConverter},
+                                                                                   ConverterParameter={StaticResource ListZones}}"
+                                                                    TextAlignment="Center"
+                                                                    FontStyle="Italic"
+                                                                    TextWrapping="Wrap"
+                                                                    Width="{Binding ElementName=GVCPersonalContent,
+                                                                                    Path=ActualWidth}"/>
+
+                                                            </ScrollViewer>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- КОММЕНТАРИЙ -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalComment"
+                                                    Header="Комментарий"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource TenPercent}}">
+
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <ScrollViewer
+                                                                MaxHeight="100">
+
+                                                                <TextBlock
+                                                                    Text="{Binding FixedQueryComment}" 
+                                                                    TextAlignment="Center"
+                                                                    FontStyle="Italic"
+                                                                    TextWrapping="Wrap"
+                                                                    Width="{Binding ElementName=GVCPersonalComment,
+                                                                                Path=ActualWidth}"/>
+
+                                                            </ScrollViewer>
+                                                            
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+
+                                                </GridViewColumn>
+
+                                                <!-- ДАТА СОЗДАНИЯ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalDateCreated"
+                                                    Header="Дата создания"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource EightPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <TextBlock
+                                                                Text="{Binding FixedQueryDateCreated, StringFormat=dd-MM-yyyy}" 
+                                                                TextAlignment="Center"
+                                                                FontStyle="Italic" 
+                                                                TextWrapping="Wrap"
+                                                                Width="{Binding ElementName=GVCPersonalDateCreated,
+                                                                        Path=ActualWidth}"/>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- КНОПКА РЕДАКТИРОВАНИЯ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalEdit"
+                                                    Header="Действие"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource EightPercent}}">
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+                                                            <Button
+                                                                Tag="{Binding FixedQueryId}"
+                                                                Click="ClickOnEditPersonalQueryButton"
+                                                                Content="Редактировать"
+                                                                Width="{Binding ElementName=GVCPersonalEdit,
+                                                                                Path=ActualWidth,
+                                                                                Converter={StaticResource MathConverter},
+                                                                                ConverterParameter={StaticResource NinetyPercent}}"/>
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+                                                </GridViewColumn>
+
+                                                <!-- КНОПКА УДАЛЕНИЯ ЗАПРОСА -->
+                                                <GridViewColumn
+                                                    x:Name="GVCPersonalRemove"
+                                                    Header="Действие"
+                                                    Width="{Binding ElementName=ListViewWithCommonRequest,
+                                                                    Path=ActualWidth,
+                                                                    Converter={StaticResource MathConverter},
+                                                                    ConverterParameter={StaticResource EightPercent}}">
+
+                                                    <GridViewColumn.CellTemplate>
+                                                        <DataTemplate>
+
+                                                            <Button
+                                                                Tag="{Binding FixedQueryId}"
+                                                                Click="ClickOnRemovePersonalQueryButton"
+                                                                Content="Удалить"
+                                                                Width="{Binding ElementName=GVCCommonRemove,
+                                                                        Path=ActualWidth,
+                                                                        Converter={StaticResource MathConverter},
+                                                                        ConverterParameter={StaticResource NinetyPercent}}"/>
+
+                                                        </DataTemplate>
+                                                    </GridViewColumn.CellTemplate>
+
+                                                </GridViewColumn>
+
+                                            </GridView.Columns>
+                                        </GridView>
+                                    </ListView.View>
+
+                                </ListView>
+
+                            </GroupBox>
+
+                            <!-- Надпись об отсутствии персональных запросов -->
+                            <TextBlock
+                                Grid.Row="2"
+                                Visibility="{Binding ElementName=ListViewWithPersonalRequest,
+                                                     Path=HasItems,
+                                                     Converter={StaticResource ListViewInscriptionVisibility}}"
+                                x:Name="InscriptionOnPersonalListView"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Text="Отсутствуют персональные запросы"
+                                FontStyle="Italic"
+                                FontSize="20"/>
+
+                            <!-- Нижний грид для кнопок -->
+                            <Grid
+                                Grid.Row="3">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Кнопка для создания нового запроса -->
+                                <Button
+                                    Grid.Column="0"
+                                    x:Name="ButtonForCreateNewRequest"
+                                    Content="Создать новый запрос"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Right"
+                                    FontStyle="Oblique"
+                                    Margin="5"/>
+
+                                <!-- Кнопка для загрузки существующего запроса -->
+                                <Button
+                                    Grid.Column="1"
+                                    IsEnabled="False"
+                                    x:Name="ButtonForLoadRequest"
+                                    Content="Загрузить выбранный запрос"
+                                    VerticalAlignment="Center"
+                                    HorizontalAlignment="Center"
+                                    FontStyle="Oblique"
+                                    Margin="5"/>
+
+                             </Grid>
+
+                        </Grid>
+
+                        <!-- Грид с основным содержимым -->
+                        <Grid
+                            x:Name="GridWithMainContent"
+                            
+                            IsEnabled="False" 
+                            Opacity="0" 
+                            Visibility="Hidden"
+                                                                
+                            Height="{Binding ElementName=OuterGrid, Path=ActualHeight}"
+                            Width="{Binding ElementName=OuterGrid, Path=ActualWidth}"
+                            Canvas.Left="100">
+
+                            <Grid.RowDefinitions>
+                                <RowDefinition x:Name="RowDefinitionWithTopOfGridWithMainContent" MinHeight="100" MaxHeight="300"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- ВЕРХНЯЯ ЧАСТЬ -->
+                            <Grid
+                                Grid.Row="0"
+                                x:Name="GridWithTopOfGridWithMainContent">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="3*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- На данном этапе выбираются необязательные параметры - период и зоны надзора, 
+                                    по которым требуется фильтрация выходных данных.
+                                    При невыбранных параметрах, поиск будет произведен по всем имеющимся в 
+                                    базе периодам и зонам надзора. -->
+
+                                <Grid
+                                    Grid.Column="0">
+
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Групповое поле Требуемый период -->
+                                    <GroupBox
+                                        Grid.Column="0"
+                                        Header="Требуемый период">
+
+                                        <!--Выбор периодов-->
+                                        <ComboBox
+                                            x:Name="ComboboxWithPeriods"
+                                            ItemsSource="{Binding CollectionOfPeriodsForms}"
+                                            SelectedItem="{Binding SelectedPeriod}"
+                                            DisplayMemberPath="NameOfPeriod"/>
+
+                                    </GroupBox>
+
+                                    <!-- Грид с зонами надзора -->
+                                    <Grid
+                                        Grid.Row="1">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition Height="Auto"/>
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+
+                                        <!-- Кнопка для выбора зон надзора -->
+                                        <Button
+                                            Grid.Row="1"
+                                            Name="ButtonSelectZones"
+                                            Margin="100,0,100,0"
+                                            Content="Выбрать зоны надзора для фильтра"/>
+
+                                        <!-- Групповое поле со списком зон надзора -->
+                                        <GroupBox
+                                            Grid.Row="2"
+                                            Header="Список с выбранными территориями">
+
+                                            <!-- Список с выбранными зонами надзора -->
+                                            <ListView
+                                                Name="ListViewSelectedZones"
+                                                ItemsSource="{Binding SelectedZones}"
+                                                MinHeight="100"
+                                                Margin="5">
+                                                <ListView.View>
+                                                    <GridView>
+                                                        <GridViewColumn
+                                                            Header="Наименование выбранной зоны надзора">
+                                                            <GridViewColumn.CellTemplate>
+                                                                <DataTemplate>
+                                                                    <TextBlock 
+                                                                        Text="{Binding SurveillanceZoneName}" 
+                                                                        TextAlignment="Center"
+                                                                        TextWrapping="Wrap"/>
+                                                                </DataTemplate>
+                                                            </GridViewColumn.CellTemplate>
+                                                        </GridViewColumn>
+                                                    </GridView>
+                                                </ListView.View>
+                                            </ListView>
+
+                                        </GroupBox>
+
+                                    </Grid>
+
+                                </Grid>
+
+                                <!-- Групповое поле "Требуемый интервал" с контролом периодов -->
+                                <GroupBox
+                                    Grid.Column="1"
+                                    Header="Требуемый интервал">
+
+                                    <!-- Контрол выбора периодов -->
+                                        <Views:VisualPeriodSelectorControl
+                                            x:Name="VisualPeriodSelectorControl"/>
+
+                                </GroupBox>
+
+                            </Grid>
+
+                            <!-- ГРУППОВОЕ ПОЛЕ С ПОЛЯМИ ВЫБОРА РАСПОЛОЖЕНИЯ ХАРАКТЕРИСТИК -->
+                            <GroupBox
+                                Grid.Row="1"
+                                x:Name="GridWithIndicatorsCharacteristics">
+
+                                <!-- ГРИД С ПОЛЯМИ ВЫБОРА РАСПОЛОЖЕНИЯ ХАРАКТЕРИСТИК -->
+                                <Grid>
+
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- Текстовое поле --> 
+                                    <TextBlock
+                                        Grid.Column="0"
+                                        VerticalAlignment="Center"
+                                        Margin="5,0,5,0"
+                                        Text="Расположение:"
+                                        FontSize="16"
+                                        FontStyle="Italic"
+                                        FontWeight="Bold"/>
+
+                                    <!-- Панель с выбором расположения года -->
+                                    <WrapPanel
+                                        Grid.Column="1"
+                                        Orientation="Horizontal">
+
+                                        <TextBlock
+                                            Text="Год -"
+                                            VerticalAlignment="Center"
+                                            FontStyle="Italic"/>
+
+                                        <ComboBox
+                                            x:Name="ComboboxWithYearPosition"
+                                            Margin="5"
+                                            MinWidth="100">
+                                            <ComboBoxItem> Шапка </ComboBoxItem>
+                                            <ComboBoxItem IsSelected="True"> Боковик </ComboBoxItem>
+                                        </ComboBox>
+
+                                    </WrapPanel>
+
+                                    <!-- Панель с выбором расположения периода -->
+                                    <WrapPanel
+                                        Grid.Column="2"
+                                        Orientation="Horizontal">
+
+                                        <TextBlock
+                                            Text="Период -"
+                                            VerticalAlignment="Center"
+                                            FontStyle="Italic"/>
+
+                                        <ComboBox
+                                            Margin="5"
+                                            x:Name="ComboboxWithPeriodPosition"
+                                            MinWidth="100">
+                                            <ComboBoxItem>Шапка</ComboBoxItem>
+                                            <ComboBoxItem IsSelected="True">Боковик</ComboBoxItem>
+                                        </ComboBox>
+
+                                    </WrapPanel>
+
+                                    <!-- Панель с выбором расположения зоны надзора -->
+                                    <WrapPanel
+                                        Grid.Column="3"
+                                        Orientation="Horizontal">
+
+                                        <TextBlock
+                                            Text="Зона надзора -"
+                                            VerticalAlignment="Center"
+                                            FontStyle="Italic"/>
+
+                                        <ComboBox
+                                            Margin="5"
+                                            x:Name="ComboboxWithZonePosition"
+                                            MinWidth="100">
+                                            <ComboBoxItem>Шапка</ComboBoxItem>
+                                            <ComboBoxItem IsSelected="True">Боковик</ComboBoxItem>
+                                        </ComboBox>
+
+                                    </WrapPanel>
+
+                                    <!-- Панель с выбором расположения расчетного показателя -->
+                                    <WrapPanel
+                                        Grid.Column="4"
+                                        Orientation="Horizontal">
+
+                                        <TextBlock
+                                            Text="Расч. показатель -"
+                                            VerticalAlignment="Center"
+                                            FontStyle="Italic"/>
+
+                                        <ComboBox
+                                            Margin="5"
+                                            x:Name="ComboboxWithCalculatedIndicator">
+                                            <ComboBoxItem IsSelected="True">Не использовать</ComboBoxItem>
+                                            <ComboBoxItem Tag="1000">Шапка(на 1000 населения)</ComboBoxItem>
+                                            <ComboBoxItem Tag="10000">Шапка(на 10000 населения)</ComboBoxItem>
+                                            <ComboBoxItem Tag="100000">Шапка(на 100000 населения)</ComboBoxItem>
+                                            <ComboBoxItem Tag="1000">Боковик(на 1000 населения)</ComboBoxItem>
+                                            <ComboBoxItem Tag="10000">Боковик(на 10000 населения)</ComboBoxItem>
+                                            <ComboBoxItem Tag="100000">Боковик(на 100000 населения)</ComboBoxItem>
+                                        </ComboBox>
+
+                                    </WrapPanel>
+
+                                    <!-- Текстовое поле -->
+                                    <TextBlock
+                                        Grid.Column="5"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        FontStyle="Italic"
+                                        FontSize="16"
+                                        FontWeight="Bold"
+                                        Margin="5,0,5,0"
+                                        Text="Порядок:"/>
+
+                                    <!-- Канвас с перемещаемыми кнопками -->
+                                    <Canvas
+                                        Grid.Column="6"
+                                        x:Name="CanvasWithOrderedButtons"
+                                        Height="30">
+
+                                        <!-- Перемещаемая кнопка с годом -->
+                                        <Button
+                                            x:Name="ButtonWithYear"
+                                            Content="Год"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            Width="120"
+                                            Height="30"
+                                            Canvas.Left="0"
+                                            AllowDrop="True"/>
+
+                                        <!-- Текстовое поле со стрелочкой -->
+                                        <TextBlock
+                                            Text=" - > "
+                                            FontSize="16"
+                                            Margin="0,5"
+                                            Width="30"
+                                            VerticalAlignment="Center"
+                                            Canvas.Left="120"/>
+
+                                        <!-- Перемещаемая кнопка с периодом -->
+                                        <Button
+                                            x:Name="ButtonWithPeriod"
+                                            Content="Период"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            Width="120"
+                                            Height="30"
+                                            Canvas.Left="150"
+                                            AllowDrop="True"/>
+
+                                        <!-- Текстовое поле со стрелочкой -->
+                                        <TextBlock
+                                            Text=" - > "
+                                            VerticalAlignment="Center"
+                                            FontSize="16"
+                                            Height="30"
+                                            Width="30"
+                                            Margin="0,5"
+                                            Canvas.Left="270"/>
+
+                                        <!-- Перемещаемая кнопка с зоной надзора -->
+                                        <Button
+                                            x:Name="ButtonWithZone"
+                                            Content="Зона надзора"
+                                            VerticalContentAlignment="Center"
+                                            HorizontalContentAlignment="Center"
+                                            Width="120"
+                                            Height="30"
+                                            Canvas.Left="300"
+                                            Canvas.Right="0"
+                                            AllowDrop="True"/>
+
+                                        <!-- Текстовое поле со стрелочкой -->
+                                        <TextBlock
+                                            x:Name="TextBlockWithArrow"
+                                            Text=" - > "
+                                            VerticalAlignment="Center"
+                                            Visibility="Collapsed"
+                                            FontSize="16"
+                                            Height="30"
+                                            Width="30"
+                                            Margin="0,5"
+                                            Canvas.Left="420"/>
+
+                                        <!-- Перемещаемая кнопка с расчетным показателем -->
+                                        <Button
+                                            x:Name="ButtonWithCalculatedIndicator"
+                                            Content="Расч. показ."
+                                            VerticalContentAlignment="Center"
+                                            Visibility="Collapsed"
+                                            Width="120"
+                                            Height="30"
+                                            Canvas.Left="450"
+                                            Canvas.Right="0"
+                                            AllowDrop="True"/>
+
+                                    </Canvas>
+
+                                    <!-- Кнопка "Перестроить шаблон" -->
+                                    <Button
+                                        x:Name="ButtonRebuildControl"
+                                        Height="30"
+                                        Grid.Column="7"
+                                        Content="Перестроить шаблон"/>
+
+                                </Grid>
+
+                            </GroupBox>
+
+                            <!-- НИЖНЯЯ ЧАСТЬ - ОТЧЕТ -->
+                            <Grid
+                                Grid.Row="2"
+                                x:Name="SecondaryOuterGrid">
+
+                                <!-- ОСНОВНАЯ ЧАСТЬ -->
+                                <Canvas
+                                    x:Name="MainCanvas">
+
+                                    <Grid
+                                        Height="{Binding ElementName=SecondaryOuterGrid, Path=ActualHeight}"
+                                        Width="{Binding ElementName=SecondaryOuterGrid, Path=ActualWidth}">
+
+                                        <!-- КОНТРОЛ ДЛЯ ОТОБРАЖЕНИЯ ОТЧЕТНЫХ ДАННЫХ -->
+                                        <controls:ControlListView
+                                            x:Name="ControlListView"
+                                            Margin="10"/>
+
+                                        <!-- ПОЛОСА ЗАГРУЗКИ ДЛЯ ОТОБРАЖЕНИЯ ПРОГРЕССА ЗАДАЧ -->
+                                        <daisyControl:DaisyView
+                                            x:Name="SecondaryDaisyView"/>
+
+                                    </Grid>
+
+                                    <!-- КОНТРОЛ ДЛЯ СОЗДАНИЯ УСЛОВИЙ -->
+                                    <localControls:ConditionsRepositoryControl
+                                        x:Name="ConditionsRepositoryControl"
+                                        AllowDrop="True"
+                                        Canvas.Left="0"
+                                        Canvas.Top="0"
+                                        Height="{Binding ElementName=SecondaryOuterGrid, 
+                                                         Path=ActualHeight, 
+                                                         Converter={StaticResource MathConverter}, 
+                                                         ConverterParameter= {StaticResource EightyPercent}}"
+                                        Width="{Binding ElementName=SecondaryOuterGrid, 
+                                                         Path=ActualWidth, 
+                                                         Converter={StaticResource MathConverter}, 
+                                                         ConverterParameter= {StaticResource NinetyPercent}}"/>
+
+                                    <!-- КОНТРОЛ ДЛЯ ОТОБРАЖЕНИЯ КАРТ -->
+                                    <localControls:MapControl
+                                        x:Name="MapControl"
+                                        AllowDrop="True"
+                                        Canvas.Left="0"
+                                        Canvas.Bottom="0"
+                                        Height="{Binding ElementName=SecondaryOuterGrid, 
+                                                         Path=ActualHeight}"
+                                        Width="{Binding ElementName=SecondaryOuterGrid, 
+                                                         Path=ActualWidth}"/>
+
+                                    <!-- КОНТРОЛ ДЛЯ ОТОБРАЖЕНИЯ ГРАФИКОВ -->
+                                    <localControls:ControlWithChart
+                                        x:Name="ControlWithChart"
+                                        AllowDrop="True"
+                                        Canvas.Right="0"
+                                        Canvas.Bottom="0"
+                                        Height="{Binding ElementName=SecondaryOuterGrid, 
+                                                         Path=ActualHeight}"
+                                        Width="{Binding ElementName=SecondaryOuterGrid, 
+                                                         Path=ActualWidth}"/>
+
+
+                                </Canvas>
+
+                            </Grid>
+
+                            <!-- ГРИД С КНОПКАМИ -->
+                            <Grid
+                                Grid.Row="3">
+
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Кнопка с надписью Сохранить текущий запрос -->
+                                <Button 
+                                    Grid.Column="1"
+                                    IsEnabled="False"
+                                    x:Name="ButtonSaveCurrentQuery"
+                                    Content="Сохранить текущий запрос"
+                                    MinHeight="30"
+                                    Margin="10"/>
+
+                                <!-- Кнопка с надписью Вернуться к списку запросов -->
+                                <Button 
+                                    Grid.Column="2"
+                                    x:Name="ReturnToListWithQueries"
+                                    Content="Вернуться к списку запросов"
+                                    MinHeight="30"
+                                    Margin="10">
+
+                                    <Button.Triggers>
+                                        <EventTrigger RoutedEvent="Button.Click">
+                                            <BeginStoryboard>
+                                                <Storyboard>
+
+                                                    <!-- Блок анимаций для СКРЫТИЯ ГРИДА ВЫБОРА ЗАПРОСОВ -->
+
+                                                    <!-- Анимация - грид с опциональными параметрами становится выключенным -->
+                                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetName="GridWithSelectionOfSavedQueries" Storyboard.TargetProperty="IsEnabled">
+                                                        <DiscreteBooleanKeyFrame KeyTime="0" Value="True"/>
+                                                    </BooleanAnimationUsingKeyFrames>
+                                                    <!-- Анимация - грид с опциональными параметрами уезжает вправо -->
+                                                    <DoubleAnimation Storyboard.TargetName="GridWithSelectionOfSavedQueries" Storyboard.TargetProperty="(Canvas.Left)" To="0" Duration="0:0:0.2"/>
+                                                    <!-- Анимация - грид с опциональными параметрами становится прозрачным -->
+                                                    <DoubleAnimation Storyboard.TargetName="GridWithSelectionOfSavedQueries" Storyboard.TargetProperty="(Opacity)" To="1" Duration="0:0:0.4"/>
+                                                    <!-- Анимация - грид с опциональными параметрами становится скрытым -->
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="GridWithSelectionOfSavedQueries" Storyboard.TargetProperty="Visibility">
+                                                        <DiscreteObjectKeyFrame KeyTime="0:0:0.0" Value="{x:Static Visibility.Visible}"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+
+                                                    <!-- Блок анимаций для ОТОБРАЖЕНИЯ ДОПОЛНИТЕЛЬНЫХ параметров -->
+
+                                                    <!-- Анимация - грид с основными параметрами становится включенным -->
+                                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetName="GridWithMainContent" Storyboard.TargetProperty="IsEnabled">
+                                                        <DiscreteBooleanKeyFrame KeyTime="0" Value="False"/>
+                                                    </BooleanAnimationUsingKeyFrames>
+                                                    <!-- Анимация - грид с основными параметрами становится видимым -->
+                                                    <ObjectAnimationUsingKeyFrames Storyboard.TargetName="GridWithMainContent" Storyboard.TargetProperty="Visibility">
+                                                        <DiscreteObjectKeyFrame KeyTime="0" Value="{x:Static Visibility.Hidden}"/>
+                                                    </ObjectAnimationUsingKeyFrames>
+                                                    <!-- Анимация - грид с основными параметрами приезжает справа -->
+                                                    <DoubleAnimation Storyboard.TargetName="GridWithMainContent" Storyboard.TargetProperty="(Canvas.Left)" To="100" Duration="0:0:0.2"/>
+                                                    <!-- Анимация - грид с основными параметрами становится непрозрачным -->
+                                                    <DoubleAnimation Storyboard.TargetName="GridWithMainContent" Storyboard.TargetProperty="(Opacity)" To="0" Duration="0:0:0.4"/>
+
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger>
+                                    </Button.Triggers>
+
+                                </Button>
+
+                                <!-- Кнопка с надписью Сформировать Excel-отчет -->
+                                <Button 
+                                    Grid.Column="3"
+                                    x:Name="GenerateReport"
+                                    Content="Сформировать Excel-отчет"
+                                    MinHeight="30"
+                                    Margin="10"/>
+
+                            </Grid>
+
+                        </Grid>
+
+                    </Canvas>
+
+                </Grid>
+
+            </Grid>
+
+        </GroupBox>
+
+        <!-- Полоса загрузки для отображения прогресса задач -->
+        <daisyControl:DaisyView x:Name="DaisyView"/>
+
+    </Grid>
+
+</UserControl>
+
+
+
+
+
+<!-- Левая часть грида с основными параметрами -->
+<!--<TextBlock 
+                                    Grid.Column="0"
+                                    TextWrapping="Wrap"
+                                    FontStyle="Italic"
+                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, 
+                                                               Path=FontSize, 
+                                                               Converter={StaticResource FontSizeConverterH3}}">
+                                    На данном этапе требуется выбрать форму и таблицу, 
+                                    в которой наличествует требуемая строк-графа.
+                                    Задаются фильтры по периодам, также имеется возможность определить диапазоны 
+                                    по значениям показателя.
+                                    По умолчанию в поля подставлены соответствующие значения из базы.
+                                    Формула объединения позволяет изменить логическое условия объединения результатов
+                                    запроса.
+                                    Условия в окне редактируемые, они позволяют изменять интервалы значений.
+
+                                </TextBlock>-->
+
+
+
+
+
+
+
+
+
+
+
+<!-- Инструкция -->
+<!--<Button 
+                        Grid.Column="3"
+                        x:Name="ButtonWithHelp"
+                        Content="Инструкция(наведите указатель)"
+                        Visibility="Collapsed"
+                        Margin="5">
+                        <Button.ToolTip>
+                            <GroupBox>
+                                <TextBlock 
+                                    TextWrapping="Wrap"
+                                    FontStyle="Italic"
+                                    FontSize="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, 
+                                                                                      Path=FontSize, 
+                                                                                      Converter={StaticResource FontSizeConverterH1}}"
+                                    Margin="5">
+                                            <Run>На данном этапе имеется возможность просмотреть результаты запроса по выбранным условиям.</Run>
+                                            <LineBreak/> 
+                                            <Run>При необходимости, возможно добавление дополнительного показателя с помощью меню выбора справа.</Run>
+                                            <LineBreak/>
+                                            <Run>На основании сделаного выбора будет построен результирующий отчет.</Run>
+                                </TextBlock>
+                            </GroupBox>
+                        </Button.ToolTip>
+                    </Button>-->
