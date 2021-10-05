@@ -1,0 +1,52 @@
+/// <summary>
+        /// Метод для возвращения данных из таблицы
+        /// </summary>
+        /// <param name="inData"> Список экземпляров класса ClassGetTextParcerResultForSearchByRequest </param>
+        /// <param name="textParcerResultList"> Список с данными </param>
+        /// <returns> Сведения о возникающем исключении ExcptionDetail </returns>
+        public ExceptionDetail GetDanTextParcerResult(out List<vTextParserResult> textParcerResultList,
+            List<ClassGetTextParcerResultForSearchByRequest> inData)
+        {
+            try
+            {
+                textParcerResultList = new List<vTextParserResult>();
+
+                var _lock = new object();
+                var tasks = new List<System.Threading.Tasks.Task>();
+                var tempListDanData = new List<vTextParserResult>();
+
+                foreach (var inDataElement in inData)
+                {
+                    var ent = new ASCRVModel(conn_str);
+
+                    var task = new System.Threading.Tasks.Task(() =>
+                    {
+                        //ЗАПРОС К ПРОЦЕДУРЕ vTextParser
+                        var resRequestTextParser = ent.vTextParser(inDataElement.FormYear, inDataElement.FormId,
+                            inDataElement.TableId,
+                            inDataElement.Year, inDataElement.PeriodId).ToList();
+
+                        //ФИЛЬТР ПО ЗОНАМ НАДЗОРА
+                        if (inDataElement.ZonesId != null)
+                            resRequestTextParser = resRequestTextParser
+                                .Where(s => inDataElement.ZonesId.Contains(s.Kod_Zone)).ToList();
+
+                        //БЛОКИРОВКА РАЗДЕЛЯЕМЫХ РЕСУРСОВ
+                        lock (_lock) { tempListDanData.AddRange(resRequestTextParser); }
+                    });
+                    //ЗАПУСК ЗАДАЧИ
+                    task.Start();
+                    tasks.Add(task);
+                }
+                //ОЖИДАНИЕ ЗАВЕРШЕНИЯ РАБОТЫ ВСЕХ ЗАДАЧ
+                System.Threading.Tasks.Task.WaitAll(tasks.ToArray());
+                textParcerResultList.AddRange(tempListDanData);
+
+                return null;
+            }
+            catch (Exception ex)
+            {
+                textParcerResultList = new List<vTextParserResult>();
+                return new ExceptionDetail(ex);
+            }
+        }
